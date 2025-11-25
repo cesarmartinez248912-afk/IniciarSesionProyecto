@@ -146,7 +146,7 @@ public class MainClienteSwing {
                     juego.imprimir("║      >>> ES TU TURNO <<<       ║");
                     juego.imprimir("╚════════════════════════════════╝");
                     juego.imprimir("1. Presiona 'Tirar dado'");
-                    juego.imprimir("2. Escribe el número de ficha (1-7) que quieres mover");
+                    juego.imprimir("2. Si puedes mover, elige una ficha (1-7)");
                     juego.imprimir("3. Presiona 'Mover'");
                     juego.imprimir("");
                 } else {
@@ -166,6 +166,13 @@ public class MainClienteSwing {
                 } else {
                     juego.imprimir(jugadorDado + " sacó: " + resultado);
                 }
+                break;
+
+            case "INFO_TURNO":
+                String mensaje = (String) m.getDatos().get("mensaje");
+                juego.imprimir("");
+                juego.imprimir("⏭️  " + mensaje);
+                juego.imprimir("");
                 break;
 
             case "state":

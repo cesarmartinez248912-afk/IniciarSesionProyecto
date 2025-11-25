@@ -18,6 +18,7 @@ public class ServidorImpl implements Servidor {
     private PipelineIniciarPartida pipeline;
     private Random random;
     private String jugadorSolicitante = null;
+    private Map<String, Integer> ultimosDados = new HashMap<>();
 
     public ServidorImpl(int puerto, Tablero tablero, GestorJugadores gestor) throws IOException {
         this.server = new ServerSocket(puerto);
@@ -142,6 +143,7 @@ public class ServidorImpl implements Servidor {
         }
 
         int resultado = random.nextInt(6) + 1;
+        ultimosDados.put(m.getRemitente(), resultado);
 
         Jugador jugador = gestor.buscarPorNombre(m.getRemitente());
 
@@ -150,6 +152,42 @@ public class ServidorImpl implements Servidor {
         datos.put("resultado", resultado);
 
         enviarATodos(new Mensaje("RESULTADO_DADO", "SERVIDOR", datos));
+
+        // Verificar si el jugador puede mover alguna ficha
+        ColorFicha color = jugador.getColor();
+        boolean puedeJugar = verificarSiPuedeJugar(color, resultado);
+
+        if (!puedeJugar) {
+            // Esperar 2 segundos y pasar turno automáticamente
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    synchronized (this) {
+                        Map<String, Object> datosInfo = new HashMap<>();
+                        datosInfo.put("mensaje", jugador.getNombre() + " no puede mover. Pasa el turno.");
+                        enviarATodos(new Mensaje("INFO_TURNO", "SERVIDOR", datosInfo));
+
+                        gestorTurnos.avanzarTurno();
+                        ultimosDados.remove(m.getRemitente());
+                        notificarTurno();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    private boolean verificarSiPuedeJugar(ColorFicha color, int resultado) {
+        List<Ficha> fichas = tablero.obtenerFichas(color);
+
+        for (Ficha ficha : fichas) {
+            if (tablero.puedeMoverse(ficha, resultado)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void manejarMovimiento(Mensaje m) {
@@ -166,6 +204,13 @@ public class ServidorImpl implements Servidor {
         try {
             int idFicha = (int) m.getDatos().get("piece");
             int pasos = (int) m.getDatos().get("steps");
+
+            // Verificar que use el dado que tiró
+            Integer dadoTirado = ultimosDados.get(m.getRemitente());
+            if (dadoTirado == null || dadoTirado != pasos) {
+                enviarError(m.getRemitente(), "Debes usar el resultado del dado que tiraste");
+                return;
+            }
 
             Jugador jugador = gestor.buscarPorNombre(m.getRemitente());
             ColorFicha color = jugador.getColor();
@@ -197,6 +242,7 @@ public class ServidorImpl implements Servidor {
             }
 
             gestorTurnos.avanzarTurno();
+            ultimosDados.remove(m.getRemitente());
             notificarTurno();
 
         } catch (Exception e) {
