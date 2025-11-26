@@ -20,6 +20,9 @@ public class ServidorImpl implements Servidor {
     private String jugadorSolicitante = null;
     private Map<String, Integer> ultimosDados = new HashMap<>();
 
+    // Para manejar la elección del centro
+    private Map<String, MovimientoPendiente> movimientosPendientes = new HashMap<>();
+
     public ServidorImpl(int puerto, Tablero tablero, GestorJugadores gestor) throws IOException {
         this.server = new ServerSocket(puerto);
         this.gestor = gestor;
@@ -61,6 +64,10 @@ public class ServidorImpl implements Servidor {
 
             case "move":
                 manejarMovimiento(m);
+                break;
+
+            case "RESPUESTA_CENTRO":
+                manejarRespuestaCentro(m);
                 break;
 
             default:
@@ -227,28 +234,66 @@ public class ServidorImpl implements Servidor {
                 return;
             }
 
-            tablero.moverFicha(ficha, pasos);
+            // Verificar si puede entrar al centro
+            if (tablero.puedeEntrarAlCentro(ficha, pasos)) {
+                // Guardar el movimiento pendiente
+                MovimientoPendiente pendiente = new MovimientoPendiente(ficha, pasos);
+                movimientosPendientes.put(m.getRemitente(), pendiente);
 
-            Map<String, Object> datos = new HashMap<>();
-            datos.put("board", tablero.obtenerEstadoTablero());
-            enviarATodos(new Mensaje("state", "SERVIDOR", datos));
-
-            if (tablero.jugadorGano(color)) {
-                Map<String, Object> datosGanador = new HashMap<>();
-                datosGanador.put("ganador", m.getRemitente());
-                enviarATodos(new Mensaje("FIN_PARTIDA", "SERVIDOR", datosGanador));
-                gestorTurnos.finalizarPartida();
+                // Preguntar al jugador
+                Map<String, Object> datosOpcion = new HashMap<>();
+                datosOpcion.put("mensaje", "¿Quieres entrar al centro seguro?");
+                datosOpcion.put("idFicha", idFicha);
+                enviarA(new Mensaje("OPCION_CENTRO", "SERVIDOR", datosOpcion), jugador);
                 return;
             }
 
-            gestorTurnos.avanzarTurno();
-            ultimosDados.remove(m.getRemitente());
-            notificarTurno();
+            // Movimiento normal (sin opción de centro)
+            ejecutarMovimiento(jugador, ficha, pasos, false);
 
         } catch (Exception e) {
             e.printStackTrace();
             enviarError(m.getRemitente(), "Error al procesar movimiento");
         }
+    }
+
+    private void manejarRespuestaCentro(Mensaje m) {
+        if (!gestorTurnos.esTurnoDe(m.getRemitente())) {
+            return;
+        }
+
+        MovimientoPendiente pendiente = movimientosPendientes.get(m.getRemitente());
+        if (pendiente == null) {
+            enviarError(m.getRemitente(), "No hay movimiento pendiente");
+            return;
+        }
+
+        boolean elegirCentro = (boolean) m.getDatos().getOrDefault("elegirCentro", false);
+        Jugador jugador = gestor.buscarPorNombre(m.getRemitente());
+
+        ejecutarMovimiento(jugador, pendiente.ficha, pendiente.pasos, elegirCentro);
+        movimientosPendientes.remove(m.getRemitente());
+    }
+
+    private void ejecutarMovimiento(Jugador jugador, Ficha ficha, int pasos, boolean elegirCentro) {
+        tablero.moverFicha(ficha, pasos, elegirCentro);
+
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("board", tablero.obtenerEstadoTablero());
+        enviarATodos(new Mensaje("state", "SERVIDOR", datos));
+
+        ColorFicha color = jugador.getColor();
+        if (tablero.jugadorGano(color)) {
+            Map<String, Object> datosGanador = new HashMap<>();
+            datosGanador.put("ganador", jugador.getNombre());
+            enviarATodos(new Mensaje("FIN_PARTIDA", "SERVIDOR", datosGanador));
+            gestorTurnos.finalizarPartida();
+            return;
+        }
+
+        gestorTurnos.avanzarTurno();
+        ultimosDados.remove(jugador.getNombre());
+        notificarTurno();
     }
 
     private void notificarTurno() {
@@ -278,5 +323,16 @@ public class ServidorImpl implements Servidor {
     @Override
     public void enviarA(Mensaje m, Jugador jugador) {
         HiloCliente.enviarAJugador(m, jugador);
+    }
+
+    // Clase interna para guardar movimientos pendientes
+    private static class MovimientoPendiente {
+        Ficha ficha;
+        int pasos;
+
+        MovimientoPendiente(Ficha ficha, int pasos) {
+            this.ficha = ficha;
+            this.pasos = pasos;
+        }
     }
 }

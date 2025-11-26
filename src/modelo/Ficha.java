@@ -10,7 +10,7 @@ public class Ficha implements Serializable {
     private boolean enPasillo;
     private int posicionPasillo; // 0-7 en el pasillo de color
     private boolean enMeta;
-
+    private boolean enCentro;
     public Ficha(int id, ColorFicha color) {
         this.id = id;
         this.color = color;
@@ -19,6 +19,7 @@ public class Ficha implements Serializable {
         this.enPasillo = false;
         this.posicionPasillo = 0;
         this.enMeta = false;
+        this.enCentro = false;
     }
 
     public int getId() { return id; }
@@ -28,6 +29,8 @@ public class Ficha implements Serializable {
     public boolean isEnCasa() { return enCasa; }
     public boolean isEnPasillo() { return enPasillo; }
     public int getPosicionPasillo() { return posicionPasillo; }
+    public boolean isEnCentro() { return enCentro; }
+    public void setEnCentro(boolean enCentro) { this.enCentro = enCentro; }
 
     public void setPosicion(int posicion) {
         this.posicion = posicion;
@@ -59,6 +62,7 @@ public class Ficha implements Serializable {
         this.posicion = -1;
         this.enCasa = true;
         this.enPasillo = false;
+        this.enCentro = false;
         this.posicionPasillo = 0;
         this.enMeta = false;
     }

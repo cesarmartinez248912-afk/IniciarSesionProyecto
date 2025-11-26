@@ -1,6 +1,7 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 import java.util.Map;
 
@@ -22,54 +23,149 @@ public class VentanaJuego extends JFrame {
     private PanelTablero panelTablero;
 
     public VentanaJuego() {
-        setTitle("Parchís");
-        setSize(1100, 650);
+        setTitle("Parchís Online");
+        setSize(1200, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(15, 15));
 
-        JPanel panelIzq = new JPanel(new BorderLayout());
+        Color colorFondo = new Color(236, 240, 241);
+        Color colorPrimario = new Color(52, 152, 219);
+        Color colorExito = new Color(46, 204, 113);
+        Color colorAdvertencia = new Color(241, 196, 15);
+        Color colorPeligro = new Color(231, 76, 60);
+
+        getContentPane().setBackground(colorFondo);
+
+        // PANEL IZQUIERDO - Jugadores e Info
+        JPanel panelIzq = new JPanel(new BorderLayout(10, 10));
+        panelIzq.setBackground(colorFondo);
+        panelIzq.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
+
+        // Lista de jugadores
+        JPanel panelJugadores = new JPanel(new BorderLayout());
+        panelJugadores.setBackground(Color.WHITE);
+        panelJugadores.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1, true),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+
+        JLabel tituloJugadores = new JLabel("Jugadores", SwingConstants.CENTER);
+        tituloJugadores.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        tituloJugadores.setForeground(new Color(44, 62, 80));
+        tituloJugadores.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
         modeloJugadores = new DefaultListModel<>();
         listaJugadores = new JList<>(modeloJugadores);
-        listaJugadores.setBorder(BorderFactory.createTitledBorder("Jugadores"));
-        JScrollPane scrollLista = new JScrollPane(listaJugadores);
-        scrollLista.setPreferredSize(new Dimension(180, 0));
-        panelIzq.add(scrollLista, BorderLayout.CENTER);
+        listaJugadores.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        listaJugadores.setBackground(new Color(250, 250, 250));
+        listaJugadores.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
+        JScrollPane scrollLista = new JScrollPane(listaJugadores);
+        scrollLista.setBorder(null);
+        scrollLista.setPreferredSize(new Dimension(200, 0));
+
+        panelJugadores.add(tituloJugadores, BorderLayout.NORTH);
+        panelJugadores.add(scrollLista, BorderLayout.CENTER);
+
+        // Panel de info
         JPanel panelInfo = new JPanel();
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
-        panelInfo.setBorder(BorderFactory.createTitledBorder("Info"));
-        labelTurno = new JLabel("Turno: -");
-        labelUltimoDado = new JLabel("Dado: -");
+        panelInfo.setBackground(Color.WHITE);
+        panelInfo.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 1, true),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+
+        JLabel tituloInfo = new JLabel("Información");
+        tituloInfo.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        tituloInfo.setForeground(new Color(44, 62, 80));
+        tituloInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        labelTurno = new JLabel("Turno: Esperando...");
+        labelTurno.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        labelTurno.setForeground(new Color(52, 73, 94));
+        labelTurno.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
+        labelTurno.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        labelUltimoDado = new JLabel("Dado: ");
+        labelUltimoDado.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        labelUltimoDado.setForeground(colorPrimario);
+        labelUltimoDado.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+        labelUltimoDado.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panelInfo.add(tituloInfo);
         panelInfo.add(labelTurno);
         panelInfo.add(labelUltimoDado);
+
+        panelIzq.add(panelJugadores, BorderLayout.CENTER);
         panelIzq.add(panelInfo, BorderLayout.SOUTH);
 
         add(panelIzq, BorderLayout.WEST);
 
+
         panelTablero = new PanelTablero();
         add(panelTablero, BorderLayout.CENTER);
+
+        // PANEL DERECHO - Consola
+        JPanel panelDerecho = new JPanel(new BorderLayout());
+        panelDerecho.setBackground(colorFondo);
+        panelDerecho.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+
+        JPanel panelConsolaHeader = new JPanel(new BorderLayout());
+        panelConsolaHeader.setBackground(new Color(44, 62, 80));
+        panelConsolaHeader.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        JLabel tituloConsola = new JLabel("Consola");
+        tituloConsola.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        tituloConsola.setForeground(Color.WHITE);
+        panelConsolaHeader.add(tituloConsola);
 
         consola = new JTextArea();
         consola.setEditable(false);
         consola.setFont(new Font("Consolas", Font.PLAIN, 12));
+        consola.setBackground(new Color(250, 250, 250));
+        consola.setForeground(new Color(44, 62, 80));
+        consola.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         JScrollPane scrollConsola = new JScrollPane(consola);
-        scrollConsola.setPreferredSize(new Dimension(280, 0));
-        scrollConsola.setBorder(BorderFactory.createTitledBorder("Consola"));
-        add(scrollConsola, BorderLayout.EAST);
+        scrollConsola.setBorder(new LineBorder(new Color(189, 195, 199), 1));
+        scrollConsola.setPreferredSize(new Dimension(300, 0));
 
-        JPanel panelControles = new JPanel(new FlowLayout());
+        JPanel wrapperConsola = new JPanel(new BorderLayout());
+        wrapperConsola.add(panelConsolaHeader, BorderLayout.NORTH);
+        wrapperConsola.add(scrollConsola, BorderLayout.CENTER);
 
-        btnSolicitarInicio = new JButton("Solicitar inicio");
-        btnConfirmar = new JButton("Confirmar");
-        btnTirarDado = new JButton("Tirar dado");
+        panelDerecho.add(wrapperConsola);
+        add(panelDerecho, BorderLayout.EAST);
+
+
+        JPanel panelControles = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        panelControles.setBackground(Color.WHITE);
+        panelControles.setBorder(new CompoundBorder(
+                new MatteBorder(1, 0, 0, 0, new Color(189, 195, 199)),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+
+        btnSolicitarInicio = crearBoton("Solicitar Inicio", colorExito);
+        btnConfirmar = crearBoton("Confirmar", colorPrimario);
+        btnTirarDado = crearBoton("Tirar Dado", colorAdvertencia);
+        btnMoverFicha = crearBoton("Mover", colorPeligro);
+
+        JLabel labelFicha = new JLabel("Ficha:");
+        labelFicha.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
         campoIdFicha = new JTextField("1", 3);
-        btnMoverFicha = new JButton("Mover");
+        campoIdFicha.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        campoIdFicha.setHorizontalAlignment(JTextField.CENTER);
+        campoIdFicha.setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 2, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
 
         panelControles.add(btnSolicitarInicio);
         panelControles.add(btnConfirmar);
         panelControles.add(btnTirarDado);
-        panelControles.add(new JLabel("Ficha (1-4):"));
+        panelControles.add(labelFicha);
         panelControles.add(campoIdFicha);
         panelControles.add(btnMoverFicha);
 
@@ -77,6 +173,38 @@ public class VentanaJuego extends JFrame {
 
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private JButton crearBoton(String texto, Color color) {
+        JButton btn = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                if (getModel().isPressed()) {
+                    g2d.setColor(color.darker());
+                } else if (getModel().isRollover()) {
+                    g2d.setColor(color.brighter());
+                } else {
+                    g2d.setColor(color);
+                }
+
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(150, 40));
+
+        return btn;
     }
 
     public void imprimir(String t) {
@@ -90,7 +218,7 @@ public class VentanaJuego extends JFrame {
         SwingUtilities.invokeLater(() -> {
             modeloJugadores.clear();
             if (jugadores != null) {
-                jugadores.forEach(modeloJugadores::addElement);
+                jugadores.forEach(j -> modeloJugadores.addElement("🎮 " + j));
             }
         });
     }
@@ -138,7 +266,10 @@ class PanelTablero extends JPanel {
 
     public PanelTablero() {
         setBackground(new Color(245, 245, 240));
-        setBorder(BorderFactory.createTitledBorder("Tablero"));
+        setBorder(new CompoundBorder(
+                new LineBorder(new Color(189, 195, 199), 2, true),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
     }
 
     public void actualizarEstado(Map<String, Object> estado) {
@@ -154,11 +285,8 @@ class PanelTablero extends JPanel {
 
         int w = getWidth();
         int h = getHeight();
-        int cx = w / 2;
-        int cy = h / 2;
 
         int tamCasilla = Math.min(w, h) / 28;
-
         int anchoBrazo = tamCasilla * 3;
         int largoBrazo = tamCasilla * 8;
         int tamCasa = tamCasilla * 7;
@@ -168,22 +296,18 @@ class PanelTablero extends JPanel {
 
         int inicioX = (w - totalAncho) / 2;
         int inicioY = (h - totalAlto) / 2;
-
         int margenCasa = (largoBrazo - tamCasa) / 2;
 
-        // Dibujar casas
         dibujarCasa(g2d, inicioX + margenCasa, inicioY + margenCasa, tamCasa, tamCasilla, Color.RED);
         dibujarCasa(g2d, inicioX + largoBrazo + anchoBrazo + margenCasa, inicioY + margenCasa, tamCasa, tamCasilla, Color.BLUE);
         dibujarCasa(g2d, inicioX + margenCasa, inicioY + largoBrazo + anchoBrazo + margenCasa, tamCasa, tamCasilla, new Color(50, 180, 50));
         dibujarCasa(g2d, inicioX + largoBrazo + anchoBrazo + margenCasa, inicioY + largoBrazo + anchoBrazo + margenCasa, tamCasa, tamCasilla, new Color(240, 200, 50));
 
-        // Dibujar brazos
         dibujarBrazoVerticalArriba(g2d, inicioX + largoBrazo, inicioY, anchoBrazo, largoBrazo, tamCasilla, Color.RED);
         dibujarBrazoHorizontalDerecha(g2d, inicioX + largoBrazo + anchoBrazo, inicioY + largoBrazo, largoBrazo, anchoBrazo, tamCasilla, Color.BLUE);
         dibujarBrazoVerticalAbajo(g2d, inicioX + largoBrazo, inicioY + largoBrazo + anchoBrazo, anchoBrazo, largoBrazo, tamCasilla, new Color(240, 200, 50));
         dibujarBrazoHorizontalIzquierda(g2d, inicioX, inicioY + largoBrazo, largoBrazo, anchoBrazo, tamCasilla, new Color(50, 180, 50));
 
-        // Centro
         int centroX = inicioX + largoBrazo;
         int centroY = inicioY + largoBrazo;
         g2d.setColor(new Color(255, 215, 0));
@@ -202,7 +326,6 @@ class PanelTablero extends JPanel {
     private void dibujarCasa(Graphics2D g2d, int x, int y, int tam, int casilla, Color color) {
         g2d.setColor(color.brighter());
         g2d.fillRoundRect(x, y, tam, tam, 20, 20);
-
         g2d.setColor(color.darker());
         g2d.setStroke(new BasicStroke(4));
         g2d.drawRoundRect(x, y, tam, tam, 20, 20);
@@ -225,13 +348,7 @@ class PanelTablero extends JPanel {
                 int py = y + i * tamCasilla;
                 int pw = ancho / 3;
                 int ph = tamCasilla;
-
-                if (j == 1 && i >= 1 && i <= 7) {
-                    g2d.setColor(colorJugador.brighter());
-                } else {
-                    g2d.setColor(Color.WHITE);
-                }
-
+                g2d.setColor((j == 1 && i >= 1 && i <= 7) ? colorJugador.brighter() : Color.WHITE);
                 g2d.fillRect(px, py, pw, ph);
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1));
@@ -247,13 +364,7 @@ class PanelTablero extends JPanel {
                 int py = y + j * (alto / 3);
                 int pw = tamCasilla;
                 int ph = alto / 3;
-
-                if (j == 1 && i >= 0 && i <= 6) {
-                    g2d.setColor(colorJugador.brighter());
-                } else {
-                    g2d.setColor(Color.WHITE);
-                }
-
+                g2d.setColor((j == 1 && i >= 0 && i <= 6) ? colorJugador.brighter() : Color.WHITE);
                 g2d.fillRect(px, py, pw, ph);
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1));
@@ -269,13 +380,7 @@ class PanelTablero extends JPanel {
                 int py = y + i * tamCasilla;
                 int pw = ancho / 3;
                 int ph = tamCasilla;
-
-                if (j == 1 && i >= 0 && i <= 6) {
-                    g2d.setColor(colorJugador.brighter());
-                } else {
-                    g2d.setColor(Color.WHITE);
-                }
-
+                g2d.setColor((j == 1 && i >= 0 && i <= 6) ? colorJugador.brighter() : Color.WHITE);
                 g2d.fillRect(px, py, pw, ph);
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1));
@@ -291,13 +396,7 @@ class PanelTablero extends JPanel {
                 int py = y + j * (alto / 3);
                 int pw = tamCasilla;
                 int ph = alto / 3;
-
-                if (j == 1 && i >= 1 && i <= 7) {
-                    g2d.setColor(colorJugador.brighter());
-                } else {
-                    g2d.setColor(Color.WHITE);
-                }
-
+                g2d.setColor((j == 1 && i >= 1 && i <= 7) ? colorJugador.brighter() : Color.WHITE);
                 g2d.fillRect(px, py, pw, ph);
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1));
@@ -309,14 +408,12 @@ class PanelTablero extends JPanel {
     private void dibujarEstrella(Graphics2D g2d, int cx, int cy, int tam) {
         int[] xPoints = new int[8];
         int[] yPoints = new int[8];
-
         for (int i = 0; i < 8; i++) {
             double angle = Math.PI / 4 * i;
             int radius = (i % 2 == 0) ? tam / 2 : tam / 4;
             xPoints[i] = cx + (int) (radius * Math.cos(angle));
             yPoints[i] = cy + (int) (radius * Math.sin(angle));
         }
-
         g2d.setColor(new Color(255, 215, 0));
         g2d.fillPolygon(xPoints, yPoints, 8);
         g2d.setColor(Color.BLACK);
@@ -328,19 +425,15 @@ class PanelTablero extends JPanel {
         for (String colorStr : estadoTablero.keySet()) {
             Color color = getColor(colorStr);
             Object obj = estadoTablero.get(colorStr);
-
             if (obj instanceof java.util.List) {
                 @SuppressWarnings("unchecked")
                 java.util.List<Map<String, Object>> fichas = (java.util.List<Map<String, Object>>) obj;
-
                 for (Map<String, Object> f : fichas) {
                     int id = (int) f.get("id");
                     boolean enMeta = (boolean) f.get("enMeta");
                     boolean enCasa = (boolean) f.get("enCasa");
                     boolean enPasillo = (boolean) f.get("enPasillo");
-
                     Point pos;
-
                     if (enMeta) {
                         pos = getPosicionMeta(colorStr, inicioX, inicioY, largoBrazo, anchoBrazo);
                     } else if (enCasa) {
@@ -349,18 +442,14 @@ class PanelTablero extends JPanel {
                         int posicionPasillo = (int) f.get("posicionPasillo");
                         pos = getPosicionPasillo(colorStr, posicionPasillo, inicioX, inicioY, largoBrazo, anchoBrazo, tamCasilla);
                     } else {
-                        // Usar las coordenadas reales del tablero (fila, columna)
                         if (f.containsKey("fila") && f.containsKey("columna")) {
                             int fila = (int) f.get("fila");
                             int columna = (int) f.get("columna");
                             pos = getPosicionTablero(fila, columna, inicioX, inicioY, largoBrazo, anchoBrazo, tamCasilla);
                         } else {
-                            // Fallback: usar posición antigua
-                            int posicion = (int) f.get("posicion");
                             pos = getPosicionCasa(colorStr, id, inicioX, inicioY, largoBrazo, anchoBrazo, tamCasa, margenCasa, tamCasilla);
                         }
                     }
-
                     dibujarFicha(g2d, pos.x, pos.y, color, id);
                 }
             }
@@ -368,47 +457,26 @@ class PanelTablero extends JPanel {
     }
 
     private Point getPosicionTablero(int fila, int columna, int inicioX, int inicioY, int largoBrazo, int anchoBrazo, int tam) {
-        // Convertir coordenadas (fila, columna) del sistema 19x19 a píxeles
-        // fila: 0-18, columna: 0-18
-
         int x, y;
-
-        // Calcular posición en píxeles basada en la cuadrícula 19x19
-        // El tablero se divide en:
-        // - Brazo izquierdo: columnas 0-7 (8 casillas)
-        // - Centro: columnas 8-10 (3 casillas)
-        // - Brazo derecho: columnas 11-18 (8 casillas)
-
-        // Similar para filas
-
         if (columna <= 7) {
-            // Brazo izquierdo
             x = inicioX + (columna * tam);
         } else if (columna <= 10) {
-            // Centro
             x = inicioX + largoBrazo + ((columna - 8) * (anchoBrazo / 3));
         } else {
-            // Brazo derecho
             x = inicioX + largoBrazo + anchoBrazo + ((columna - 11) * tam);
         }
-
         if (fila <= 7) {
-            // Brazo superior
             y = inicioY + (fila * tam);
         } else if (fila <= 10) {
-            // Centro
             y = inicioY + largoBrazo + ((fila - 8) * (anchoBrazo / 3));
         } else {
-            // Brazo inferior
             y = inicioY + largoBrazo + anchoBrazo + ((fila - 11) * tam);
         }
-
         return new Point(x + tam/2, y + tam/2);
     }
 
     private Point getPosicionPasillo(String color, int posPasillo, int inicioX, int inicioY, int largoBrazo, int anchoBrazo, int tam) {
         int x, y;
-
         switch (color.toUpperCase()) {
             case "ROJO":
                 x = inicioX + largoBrazo + anchoBrazo / 2;
@@ -428,19 +496,15 @@ class PanelTablero extends JPanel {
                 y = inicioY + largoBrazo + anchoBrazo / 2;
                 break;
         }
-
         return new Point(x + tam/2, y + tam/2);
     }
 
     private Point getPosicionMeta(String color, int inicioX, int inicioY, int largoBrazo, int anchoBrazo) {
-        int x = inicioX + largoBrazo + anchoBrazo / 2;
-        int y = inicioY + largoBrazo + anchoBrazo / 2;
-        return new Point(x, y);
+        return new Point(inicioX + largoBrazo + anchoBrazo / 2, inicioY + largoBrazo + anchoBrazo / 2);
     }
 
     private Point getPosicionCasa(String color, int id, int inicioX, int inicioY, int largoBrazo, int anchoBrazo, int tamCasa, int margenCasa, int tam) {
         int baseX, baseY;
-
         switch (color.toUpperCase()) {
             case "ROJO":
                 baseX = inicioX + margenCasa + tamCasa / 2;
@@ -460,34 +524,22 @@ class PanelTablero extends JPanel {
                 baseY = inicioY + largoBrazo + anchoBrazo + margenCasa + tamCasa / 2;
                 break;
         }
-
         int offsetX = ((id - 1) % 2) * tam - tam / 2;
         int offsetY = ((id - 1) / 2) * tam - tam / 2;
-
         return new Point(baseX + offsetX, baseY + offsetY);
     }
 
     private void dibujarFicha(Graphics2D g2d, int x, int y, Color color, int numero) {
         int radio = 12;
-
-        // Sombra
         g2d.setColor(new Color(0, 0, 0, 50));
         g2d.fillOval(x - radio + 2, y - radio + 2, radio * 2, radio * 2);
-
-        // Ficha
         g2d.setColor(color);
         g2d.fillOval(x - radio, y - radio, radio * 2, radio * 2);
-
-        // Borde
         g2d.setColor(color.darker());
         g2d.setStroke(new BasicStroke(2));
         g2d.drawOval(x - radio, y - radio, radio * 2, radio * 2);
-
-        // Brillo
         g2d.setColor(new Color(255, 255, 255, 100));
         g2d.fillOval(x - radio/2, y - radio/2, radio, radio);
-
-        // Número identificador
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 14));
         FontMetrics fm = g2d.getFontMetrics();
