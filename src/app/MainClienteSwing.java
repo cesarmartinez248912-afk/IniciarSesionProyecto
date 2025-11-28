@@ -51,7 +51,7 @@ public class MainClienteSwing {
         VentanaJuego juego = new VentanaJuego();
         juego.imprimir("Conectado como: " + nombre);
 
-        // Manejar cierre de ventana
+
         juego.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -60,12 +60,11 @@ public class MainClienteSwing {
             }
         });
 
-        // Botón de desconectar
+
         juego.getBotonDesconectar().addActionListener(ev -> {
             desconectar(juego);
             juego.dispose();
 
-            // Volver a la ventana inicial
             SwingUtilities.invokeLater(() -> {
                 VentanaInicial nuevaVentana = new VentanaInicial();
                 nuevaVentana.getBotonConectar().addActionListener(e2 -> {
@@ -84,7 +83,6 @@ public class MainClienteSwing {
             });
         });
 
-        // Hilo para escuchar mensajes del servidor
         hiloEscucha = new Thread(() -> {
             while (conectado) {
                 try {
@@ -146,12 +144,12 @@ public class MainClienteSwing {
 
             juego.imprimir("Desconectándose...");
 
-            // Cerrar recursos
+
             if (in != null) in.close();
             if (out != null) out.close();
             if (socket != null) socket.close();
 
-            // Interrumpir hilo de escucha
+
             if (hiloEscucha != null) {
                 hiloEscucha.interrupt();
             }

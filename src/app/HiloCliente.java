@@ -39,12 +39,12 @@ public class HiloCliente extends Thread {
             jugador = new Jugador(nombre);
             gestor.agregarJugador(jugador);
 
-            // Registrar la conexión
+
             conexiones.put(jugador, out);
 
             System.out.println("✓ Jugador conectado: " + nombre);
 
-            // Notificar a todos los jugadores actualizados
+
             servidor.enviarATodos(
                     new Mensaje(
                             "ACTUALIZAR_JUGADORES",
@@ -53,7 +53,7 @@ public class HiloCliente extends Thread {
                     )
             );
 
-            // Escuchar mensajes del cliente
+
             while (true) {
                 Mensaje m = (Mensaje) in.readObject();
                 servidor.procesarMensaje(m);
@@ -90,7 +90,7 @@ public class HiloCliente extends Thread {
     }
 
     public static synchronized void enviarATodos(Mensaje m) {
-        // Crear una copia para evitar ConcurrentModificationException
+
         HashMap<Jugador, ObjectOutputStream> copia = new HashMap<>(conexiones);
 
         copia.forEach((jugador, out) -> {
