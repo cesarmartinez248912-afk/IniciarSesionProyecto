@@ -12,6 +12,7 @@ public class VentanaJuego extends JFrame {
     private JButton btnConfirmar;
     private JButton btnTirarDado;
     private JButton btnMoverFicha;
+    private JButton btnDesconectar;
     private JTextField campoIdFicha;
     private JLabel labelTurno;
     private JLabel labelUltimoDado;
@@ -150,7 +151,7 @@ public class VentanaJuego extends JFrame {
         btnConfirmar = crearBoton("Confirmar", colorPrimario);
         btnTirarDado = crearBoton("Tirar Dado", colorAdvertencia);
         btnMoverFicha = crearBoton("Mover", colorPeligro);
-
+        btnDesconectar = crearBoton("Desconectar", new Color(231, 76, 60));
         JLabel labelFicha = new JLabel("Ficha:");
         labelFicha.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
@@ -168,6 +169,7 @@ public class VentanaJuego extends JFrame {
         panelControles.add(labelFicha);
         panelControles.add(campoIdFicha);
         panelControles.add(btnMoverFicha);
+        panelControles.add(btnDesconectar);
 
         add(panelControles, BorderLayout.SOUTH);
 
@@ -250,7 +252,7 @@ public class VentanaJuego extends JFrame {
     public JButton getConfirmar() { return btnConfirmar; }
     public JButton getTirarDado() { return btnTirarDado; }
     public JButton getMoverFicha() { return btnMoverFicha; }
-
+    public JButton getBotonDesconectar() { return btnDesconectar; }
     public int getIdFicha() {
         try { return Integer.parseInt(campoIdFicha.getText()); }
         catch (NumberFormatException e) { return 1; }

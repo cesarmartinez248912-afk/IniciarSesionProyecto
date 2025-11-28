@@ -70,6 +70,10 @@ public class ServidorImpl implements Servidor {
                 manejarRespuestaCentro(m);
                 break;
 
+            case "DESCONEXION":
+                manejarDesconexion(m);
+                break;
+
             default:
                 System.out.println("Mensaje: " + tipo);
         }
@@ -294,6 +298,61 @@ public class ServidorImpl implements Servidor {
         gestorTurnos.avanzarTurno();
         ultimosDados.remove(jugador.getNombre());
         notificarTurno();
+    }
+
+    private void manejarDesconexion(Mensaje m) {
+        String nombreJugador = m.getRemitente();
+
+        System.out.println("════════════════════════════════════════");
+        System.out.println("⚠️  Jugador \"" + nombreJugador + "\" se ha desconectado");
+        System.out.println("════════════════════════════════════════");
+
+        // Buscar el jugador
+        Jugador jugador = gestor.buscarPorNombre(nombreJugador);
+
+        if (jugador != null) {
+            // Si tiene un color asignado, limpiar sus fichas del tablero
+            if (jugador.getColor() != null) {
+                tablero.eliminarFichasJugador(jugador.getColor());
+
+                // Actualizar el tablero para todos
+                Map<String, Object> datos = new HashMap<>();
+                datos.put("board", tablero.obtenerEstadoTablero());
+                enviarATodos(new Mensaje("state", "SERVIDOR", datos));
+            }
+
+            // Remover al jugador de la lista
+            gestor.removerJugador(jugador);
+
+            // Notificar a todos los demás jugadores
+            Map<String, Object> datosDesconexion = new HashMap<>();
+            datosDesconexion.put("jugador", nombreJugador);
+            enviarATodos(new Mensaje("JUGADOR_DESCONECTADO", "SERVIDOR", datosDesconexion));
+
+            // Actualizar lista de jugadores
+            enviarATodos(new Mensaje(
+                    "ACTUALIZAR_JUGADORES",
+                    "SERVIDOR",
+                    Map.of("jugadores", gestor.obtenerNombresJugadores())
+            ));
+
+            // Si la partida estaba en curso, verificar si queda alguien
+            if (gestorTurnos.isPartidaIniciada()) {
+                if (gestor.cantidadJugadores() < 2) {
+                    Map<String, Object> datosFin = new HashMap<>();
+                    datosFin.put("mensaje", "Partida terminada: no quedan suficientes jugadores");
+                    enviarATodos(new Mensaje("ERROR", "SERVIDOR", datosFin));
+                    gestorTurnos.finalizarPartida();
+                } else {
+                    // Si era el turno del jugador desconectado, pasar al siguiente
+                    Jugador actual = gestorTurnos.obtenerJugadorActual();
+                    if (actual != null && actual.getNombre().equals(nombreJugador)) {
+                        gestorTurnos.avanzarTurno();
+                        notificarTurno();
+                    }
+                }
+            }
+        }
     }
 
     private void notificarTurno() {

@@ -11,7 +11,7 @@ public class Tablero implements Serializable {
 
     private static final int CASILLAS_TABLERO = 68;
     private static final int CASILLAS_PASILLO = 7;
-    private static final int POSICION_CENTRO = 34; // Posición que lleva al centro
+    private static final int POSICION_CENTRO = 11; // Posición donde ROJO puede entrar al centro (6 casillas desde salida)
 
     // Ficha que está actualmente en el centro
     private Ficha fichaEnCentro = null;
@@ -59,16 +59,22 @@ public class Tablero implements Serializable {
 
     /**
      * Verifica si una ficha puede entrar al centro con el número de pasos exacto
+     * Solo aplica para ROJO en la posición 11
      */
     public boolean puedeEntrarAlCentro(Ficha ficha, int pasos) {
         if (ficha.isEnCasa() || ficha.isEnPasillo() || ficha.isEnMeta() || ficha.isEnCentro()) {
             return false;
         }
 
+        // Solo el ROJO puede entrar al centro desde la posición 11
+        if (ficha.getColor() != ColorFicha.ROJO) {
+            return false;
+        }
+
         int posActual = ficha.getPosicion();
         int posDestino = posActual + pasos;
 
-        // Verificar si con esos pasos llega exactamente a la posición del centro
+        // Verificar si con esos pasos llega exactamente a la posición del centro (11)
         return posDestino == POSICION_CENTRO;
     }
 
@@ -104,14 +110,15 @@ public class Tablero implements Serializable {
         if (!ficha.isEnCentro()) return;
 
         ficha.setEnCentro(false);
-        ficha.setPosicion(POSICION_CENTRO + 1); // Sale a la siguiente casilla
+        // Sale a la posición 12 (siguiente después del centro para ROJO)
+        ficha.setPosicion(12);
 
         if (fichaEnCentro == ficha) {
             fichaEnCentro = null;
         }
 
         System.out.println("Ficha " + ficha.getId() + " de " + ficha.getColor() +
-                " salió del centro a posición " + (POSICION_CENTRO + 1));
+                " salió del centro a posición 12");
     }
 
     public boolean puedeMoverse(Ficha ficha, int pasos) {
@@ -257,6 +264,21 @@ public class Tablero implements Serializable {
     }
 
     /**
+     * Elimina todas las fichas de un jugador del tablero (cuando se desconecta)
+     */
+    public void eliminarFichasJugador(ColorFicha color) {
+        // Si la ficha en el centro es de este jugador, limpiarla
+        if (fichaEnCentro != null && fichaEnCentro.getColor() == color) {
+            fichaEnCentro = null;
+        }
+
+        // Remover el color del mapa de fichas
+        fichasPorColor.remove(color);
+
+        System.out.println("Fichas del jugador " + color + " eliminadas del tablero");
+    }
+
+    /**
      * Convierte posición lineal a coordenadas del tablero visual
      * ROJO se mueve hacia ABAJO después de salir
      * AZUL se mueve hacia la IZQUIERDA después de salir
@@ -379,96 +401,114 @@ public class Tablero implements Serializable {
         } else if (posicion == 38) {
             coords.put("fila", 6);
             coords.put("columna", 2);
-        } else if (posicion == 39) {
-            coords.put("fila", 8);
+        }
+
+        // Posición 39: SALIDA VERDE - 2 casillas abajo (fila 10)
+        else if (posicion == 39) {
+            coords.put("fila", 10);
             coords.put("columna", 2);
-        } else if (posicion == 40) {
-            coords.put("fila", 5);
-            coords.put("columna", 2);
-        } else if (posicion == 41) {
-            coords.put("fila", 4);
-            coords.put("columna", 2);
-        } else if (posicion == 42) {
-            coords.put("fila", 3);
-            coords.put("columna", 2);
-        } else if (posicion == 43) {
-            coords.put("fila", 2);
-            coords.put("columna", 2);
-        } else if (posicion == 44) {
-            coords.put("fila", 1);
-            coords.put("columna", 2);
-        } else if (posicion == 45) {
-            coords.put("fila", 0);
-            coords.put("columna", 2);
-        } else if (posicion == 46) {
-            coords.put("fila", 0);
+        }
+
+        // Posiciones 40-47: VERDE se mueve hacia la DERECHA
+        else if (posicion == 40) {
+            coords.put("fila", 10);
             coords.put("columna", 3);
-        } else if (posicion == 47) {
-            coords.put("fila", 0);
+        } else if (posicion == 41) {
+            coords.put("fila", 10);
             coords.put("columna", 4);
-        } else if (posicion == 48) {
-            coords.put("fila", 0);
+        } else if (posicion == 42) {
+            coords.put("fila", 10);
             coords.put("columna", 5);
-        } else if (posicion == 49) {
-            coords.put("fila", 0);
+        } else if (posicion == 43) {
+            coords.put("fila", 10);
             coords.put("columna", 6);
-        } else if (posicion == 50) {
-            coords.put("fila", 0);
+        } else if (posicion == 44) {
+            coords.put("fila", 10);
             coords.put("columna", 7);
-        } else if (posicion == 51) {
-            coords.put("fila", 0);
+        } else if (posicion == 45) {
+            coords.put("fila", 10);
             coords.put("columna", 8);
-        } else if (posicion == 52) {
-            coords.put("fila", 0);
+        } else if (posicion == 46) {
+            coords.put("fila", 10);
             coords.put("columna", 9);
+        } else if (posicion == 47) {
+            coords.put("fila", 10);
+            coords.put("columna", 10);
+        }
+
+        // Posiciones 48-55: Girando hacia arriba (esquina inferior derecha)
+        else if (posicion == 48) {
+            coords.put("fila", 11);
+            coords.put("columna", 10);
+        } else if (posicion == 49) {
+            coords.put("fila", 11);
+            coords.put("columna", 11);
+        } else if (posicion == 50) {
+            coords.put("fila", 11);
+            coords.put("columna", 12);
+        } else if (posicion == 51) {
+            coords.put("fila", 11);
+            coords.put("columna", 13);
+        } else if (posicion == 52) {
+            coords.put("fila", 11);
+            coords.put("columna", 14);
         } else if (posicion == 53) {
-            coords.put("fila", 0);
-            coords.put("columna", 10);
+            coords.put("fila", 11);
+            coords.put("columna", 15);
         } else if (posicion == 54) {
-            coords.put("fila", 1);
-            coords.put("columna", 10);
+            coords.put("fila", 11);
+            coords.put("columna", 16);
         } else if (posicion == 55) {
-            coords.put("fila", 2);
+            coords.put("fila", 10);
+            coords.put("columna", 16);
+        }
+
+        // Posición 56: SALIDA AMARILLA - 6 casillas abajo en columna 10 (fila 16, columna 10)
+        else if (posicion == 56) {
+            coords.put("fila", 16);
             coords.put("columna", 10);
-        } else if (posicion == 56) {
-            coords.put("fila", 14);
-            coords.put("columna", 8);
-        } else if (posicion == 57) {
-            coords.put("fila", 3);
+        }
+
+        // Posiciones 57-64: AMARILLO se mueve hacia ARRIBA
+        else if (posicion == 57) {
+            coords.put("fila", 15);
             coords.put("columna", 10);
         } else if (posicion == 58) {
-            coords.put("fila", 4);
+            coords.put("fila", 14);
             coords.put("columna", 10);
         } else if (posicion == 59) {
-            coords.put("fila", 5);
+            coords.put("fila", 13);
             coords.put("columna", 10);
         } else if (posicion == 60) {
-            coords.put("fila", 6);
+            coords.put("fila", 12);
             coords.put("columna", 10);
         } else if (posicion == 61) {
-            coords.put("fila", 7);
+            coords.put("fila", 11);
             coords.put("columna", 10);
         } else if (posicion == 62) {
-            coords.put("fila", 8);
+            coords.put("fila", 10);
             coords.put("columna", 10);
         } else if (posicion == 63) {
             coords.put("fila", 9);
             coords.put("columna", 10);
         } else if (posicion == 64) {
-            coords.put("fila", 10);
+            coords.put("fila", 8);
             coords.put("columna", 10);
-        } else if (posicion == 65) {
-            coords.put("fila", 11);
-            coords.put("columna", 10);
+        }
+
+        // Posiciones 65-68: Girando hacia la izquierda (esquina superior derecha)
+        else if (posicion == 65) {
+            coords.put("fila", 1);
+            coords.put("columna", 16);
         } else if (posicion == 66) {
-            coords.put("fila", 11);
-            coords.put("columna", 9);
+            coords.put("fila", 0);
+            coords.put("columna", 16);
         } else if (posicion == 67) {
-            coords.put("fila", 11);
-            coords.put("columna", 8);
+            coords.put("fila", 0);
+            coords.put("columna", 15);
         } else if (posicion == 68) {
-            coords.put("fila", 11);
-            coords.put("columna", 7);
+            coords.put("fila", 0);
+            coords.put("columna", 14);
         }
 
         return coords;
