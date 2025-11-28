@@ -7,23 +7,22 @@ import java.awt.*;
 public class VentanaInicial extends JFrame {
 
     private JTextField campoIP;
+    private JTextField campoPuerto;
     private JTextField campoNombre;
     private JButton botonConectar;
 
     public VentanaInicial() {
         setTitle("Parchís Online");
-        setSize(450, 550);
+        setSize(450, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setResizable(false);
-
 
         Color colorPrimario = new Color(52, 152, 219);
         Color colorSecundario = new Color(41, 128, 185);
         Color colorFondo = new Color(236, 240, 241);
         Color colorTexto = new Color(44, 62, 80);
         Color colorBorde = new Color(189, 195, 199);
-
 
         JPanel panelPrincipal = new JPanel() {
             @Override
@@ -40,7 +39,7 @@ public class VentanaInicial extends JFrame {
         };
         panelPrincipal.setLayout(null);
 
-        // Título con icono de dados
+        // Título
         JLabel titulo = new JLabel("PARCHÍS ONLINE", SwingConstants.CENTER);
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         titulo.setForeground(colorPrimario);
@@ -51,23 +50,23 @@ public class VentanaInicial extends JFrame {
         subtitulo.setForeground(colorTexto.brighter());
         subtitulo.setBounds(0, 90, 450, 25);
 
-
+        // Panel formulario
         JPanel panelFormulario = new JPanel();
         panelFormulario.setLayout(null);
         panelFormulario.setBackground(Color.WHITE);
-        panelFormulario.setBounds(50, 150, 350, 260);
+        panelFormulario.setBounds(50, 150, 350, 310);
         panelFormulario.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(colorBorde, 1, true),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        // Efecto de sombra (simulado con paneles)
+        // Sombra
         JPanel sombra = new JPanel();
         sombra.setBackground(new Color(0, 0, 0, 20));
-        sombra.setBounds(55, 155, 350, 260);
+        sombra.setBounds(55, 155, 350, 310);
 
-        // Icono de servidor
-        JLabel iconoServidor = new JLabel("", SwingConstants.CENTER);
+        // Icono servidor
+        JLabel iconoServidor = new JLabel("🎮", SwingConstants.CENTER);
         iconoServidor.setFont(new Font("Segoe UI", Font.PLAIN, 40));
         iconoServidor.setBounds(145, 10, 60, 50);
 
@@ -75,11 +74,11 @@ public class VentanaInicial extends JFrame {
         JLabel labelIP = new JLabel("Dirección del Servidor");
         labelIP.setFont(new Font("Segoe UI", Font.BOLD, 13));
         labelIP.setForeground(colorTexto);
-        labelIP.setBounds(20, 80, 310, 20);
+        labelIP.setBounds(20, 70, 310, 20);
 
-        // Campo IP estilizado
+        // Campo IP
         campoIP = new JTextField("localhost");
-        campoIP.setBounds(20, 105, 310, 40);
+        campoIP.setBounds(20, 95, 310, 40);
         campoIP.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         campoIP.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(colorBorde, 1, true),
@@ -87,15 +86,31 @@ public class VentanaInicial extends JFrame {
         ));
         campoIP.setBackground(colorFondo);
 
+        // Label Puerto
+        JLabel labelPuerto = new JLabel("Puerto");
+        labelPuerto.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        labelPuerto.setForeground(colorTexto);
+        labelPuerto.setBounds(20, 145, 310, 20);
+
+        // Campo Puerto
+        campoPuerto = new JTextField("5000");
+        campoPuerto.setBounds(20, 170, 310, 40);
+        campoPuerto.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        campoPuerto.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(colorBorde, 1, true),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
+        campoPuerto.setBackground(colorFondo);
+
         // Label Nombre
         JLabel labelNombre = new JLabel("Tu nickname");
         labelNombre.setFont(new Font("Segoe UI", Font.BOLD, 13));
         labelNombre.setForeground(colorTexto);
-        labelNombre.setBounds(20, 155, 310, 20);
+        labelNombre.setBounds(20, 220, 310, 20);
 
-        // Campo Nombre estilizado
+        // Campo Nombre
         campoNombre = new JTextField();
-        campoNombre.setBounds(20, 180, 310, 40);
+        campoNombre.setBounds(20, 245, 310, 40);
         campoNombre.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         campoNombre.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(colorBorde, 1, true),
@@ -103,17 +118,19 @@ public class VentanaInicial extends JFrame {
         ));
         campoNombre.setBackground(colorFondo);
 
-        // Agregar placeholders
+        // Placeholder
         agregarPlaceholder(campoNombre, "Ingresa tu nombre...");
 
         // Agregar componentes al formulario
         panelFormulario.add(iconoServidor);
         panelFormulario.add(labelIP);
         panelFormulario.add(campoIP);
+        panelFormulario.add(labelPuerto);
+        panelFormulario.add(campoPuerto);
         panelFormulario.add(labelNombre);
         panelFormulario.add(campoNombre);
 
-        // Botón conectar con estilo moderno
+        // Botón conectar
         botonConectar = new JButton("CONECTAR") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -133,14 +150,13 @@ public class VentanaInicial extends JFrame {
                 super.paintComponent(g);
             }
         };
-        botonConectar.setBounds(100, 440, 250, 50);
+        botonConectar.setBounds(100, 490, 250, 50);
         botonConectar.setFont(new Font("Segoe UI", Font.BOLD, 16));
         botonConectar.setForeground(Color.WHITE);
         botonConectar.setFocusPainted(false);
         botonConectar.setBorderPainted(false);
         botonConectar.setContentAreaFilled(false);
         botonConectar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
 
         panelPrincipal.add(sombra);
         panelPrincipal.add(titulo);
@@ -150,8 +166,9 @@ public class VentanaInicial extends JFrame {
 
         add(panelPrincipal);
 
-        // Efectos hover en campos
+        // Efectos hover
         agregarEfectoHover(campoIP, colorBorde, colorPrimario);
+        agregarEfectoHover(campoPuerto, colorBorde, colorPrimario);
         agregarEfectoHover(campoNombre, colorBorde, colorPrimario);
 
         setLocationRelativeTo(null);
@@ -212,11 +229,21 @@ public class VentanaInicial extends JFrame {
         });
     }
 
-    public JButton getBotonConectar() { return botonConectar; }
+    public JButton getBotonConectar() {
+        return botonConectar;
+    }
 
     public String getIP() {
         String text = campoIP.getText();
         return text;
+    }
+
+    public int getPuerto() {
+        try {
+            return Integer.parseInt(campoPuerto.getText().trim());
+        } catch (NumberFormatException e) {
+            return 5000; // Puerto por defecto
+        }
     }
 
     public String getNombre() {

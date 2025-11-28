@@ -30,7 +30,7 @@ public class MainClienteSwing {
                         JOptionPane.showMessageDialog(null, "Debe ingresar un nombre");
                         return;
                     }
-                    conectar(inicio.getIP(), nombre);
+                    conectar(inicio.getIP(), inicio.getPuerto(), nombre);
                     inicio.dispose();
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Error al conectar: " + ex.getMessage());
@@ -39,9 +39,9 @@ public class MainClienteSwing {
         });
     }
 
-    private static void conectar(String ip, String nombre) throws Exception {
+    private static void conectar(String ip, int puerto, String nombre) throws Exception {
         miNombre = nombre;
-        socket = new Socket(ip, 5000);
+        socket = new Socket(ip, puerto);
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
         conectado = true;
@@ -50,8 +50,9 @@ public class MainClienteSwing {
 
         VentanaJuego juego = new VentanaJuego();
         juego.imprimir("Conectado como: " + nombre);
+        juego.imprimir("Servidor: " + ip + ":" + puerto);
 
-
+        // Manejar cierre de ventana
         juego.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -60,11 +61,12 @@ public class MainClienteSwing {
             }
         });
 
-
+        // Botón de desconectar
         juego.getBotonDesconectar().addActionListener(ev -> {
             desconectar(juego);
             juego.dispose();
 
+            // Volver a la ventana inicial
             SwingUtilities.invokeLater(() -> {
                 VentanaInicial nuevaVentana = new VentanaInicial();
                 nuevaVentana.getBotonConectar().addActionListener(e2 -> {
@@ -74,7 +76,7 @@ public class MainClienteSwing {
                             JOptionPane.showMessageDialog(null, "Debe ingresar un nombre");
                             return;
                         }
-                        conectar(nuevaVentana.getIP(), nuevoNombre);
+                        conectar(nuevaVentana.getIP(), nuevaVentana.getPuerto(), nuevoNombre);
                         nuevaVentana.dispose();
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(null, "Error al conectar: " + ex.getMessage());
@@ -83,6 +85,7 @@ public class MainClienteSwing {
             });
         });
 
+        // Hilo para escuchar mensajes del servidor
         hiloEscucha = new Thread(() -> {
             while (conectado) {
                 try {
@@ -144,12 +147,12 @@ public class MainClienteSwing {
 
             juego.imprimir("Desconectándose...");
 
-
+            // Cerrar recursos
             if (in != null) in.close();
             if (out != null) out.close();
             if (socket != null) socket.close();
 
-
+            // Interrumpir hilo de escucha
             if (hiloEscucha != null) {
                 hiloEscucha.interrupt();
             }

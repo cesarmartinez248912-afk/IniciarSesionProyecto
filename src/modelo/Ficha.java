@@ -5,12 +5,13 @@ import java.io.Serializable;
 public class Ficha implements Serializable {
     private int id;
     private ColorFicha color;
-    private int posicion; // -1 = casa, 0-67 = tablero circular
+    private int posicion; // -1 = casa, 0-68 = tablero circular
     private boolean enCasa;
     private boolean enPasillo;
     private int posicionPasillo; // 0-7 en el pasillo de color
     private boolean enMeta;
-    private boolean enCentro;
+    private boolean enCentro; // NUEVO: para el centro seguro
+
     public Ficha(int id, ColorFicha color) {
         this.id = id;
         this.color = color;
@@ -19,9 +20,10 @@ public class Ficha implements Serializable {
         this.enPasillo = false;
         this.posicionPasillo = 0;
         this.enMeta = false;
-        this.enCentro = false;
+        this.enCentro = false; // Inicialmente no está en el centro
     }
 
+    // Getters
     public int getId() { return id; }
     public ColorFicha getColor() { return color; }
     public int getPosicion() { return posicion; }
@@ -30,8 +32,8 @@ public class Ficha implements Serializable {
     public boolean isEnPasillo() { return enPasillo; }
     public int getPosicionPasillo() { return posicionPasillo; }
     public boolean isEnCentro() { return enCentro; }
-    public void setEnCentro(boolean enCentro) { this.enCentro = enCentro; }
 
+    // Setters
     public void setPosicion(int posicion) {
         this.posicion = posicion;
     }
@@ -52,6 +54,10 @@ public class Ficha implements Serializable {
         this.enMeta = enMeta;
     }
 
+    public void setEnCentro(boolean enCentro) {
+        this.enCentro = enCentro;
+    }
+
     public void mover(int pasos) {
         if (!isEnCasa() && !enMeta) {
             this.posicion += pasos;
@@ -62,7 +68,7 @@ public class Ficha implements Serializable {
         this.posicion = -1;
         this.enCasa = true;
         this.enPasillo = false;
-        this.enCentro = false;
+        this.enCentro = false; // También resetear el centro
         this.posicionPasillo = 0;
         this.enMeta = false;
     }
